@@ -3,7 +3,7 @@
     <center>
       <div class="container">
         <h1>Recon's Password Generator</h1>
-        <p>Click the button below to generate a secure password:</p>
+        <p>Click the button below to generate a secure password.</p>
         <button @click="generatePassword">Generate Password</button>
         <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
         <!-- bind checkbox to 'scramble' data property -->
