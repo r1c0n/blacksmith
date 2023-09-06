@@ -1,6 +1,16 @@
+.container {
+  width: 80%;
+  max-width: 700px;
+  padding: 20px;
+  background-color: transparent;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+}
+
 body {
   font-family: Arial, sans-serif;
-  text-align: center;
   background-color: #f0f0f0;
 }
 
@@ -12,6 +22,7 @@ body {
   background-color: #fff;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
+  overflow-wrap: break-word;
 }
 
 button {
@@ -27,4 +38,9 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.footer {
+  bottom: 0;
+  font-weight: bold;
 }
