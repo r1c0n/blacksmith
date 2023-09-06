@@ -1,0 +1,20 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+#password {
+  font-size: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin: 10px;
+}
+
+button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
