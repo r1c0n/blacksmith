@@ -6,8 +6,9 @@
         <p>Click the button below to generate a secure password.</p>
         <button @click="generatePassword">Generate Password</button>
         <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
-        <!-- bind checkbox to 'scramble' data property -->
         <label for="scrambleCheckbox">Scramble Password</label>
+        <input type="checkbox" id="noWordsCheckbox" v-model="noWords" />
+        <label for="noWordsCheckbox">No Words</label>
         <div id="password">{{ generatedPassword }}</div>
       </div>
       <div class="footer">
@@ -68,13 +69,139 @@ const vietnameseWords = [
   'Nước'
 ]
 const koreanWords = ['집', '사과', '자동차', '테이블', '케이크', '의자', '꽃', '창문', '정원', '물']
+const germanLetters = ['ä', 'Ä', 'ö', 'Ö', 'ü', 'Ü', 'ß']
+const dutchLetters = ['ä', 'Ä', 'ë', 'Ë', 'ï', 'Ï', 'ö', 'Ö', 'ü', 'Ü', 'ÿ', 'Ÿ']
+const vietnameseLetters = [
+  'ạ',
+  'Ạ',
+  'ả',
+  'Ả',
+  'ầ',
+  'Ầ',
+  'ấ',
+  'Ấ',
+  'ậ',
+  'Ậ',
+  'ẩ',
+  'Ẩ',
+  'ẫ',
+  'Ẫ',
+  'ắ',
+  'Ắ',
+  'ằ',
+  'Ằ',
+  'ẳ',
+  'Ẳ',
+  'ẵ',
+  'Ẵ',
+  'ặ',
+  'Ặ',
+  'ẹ',
+  'Ẹ',
+  'ẻ',
+  'Ẻ',
+  'ẽ',
+  'Ẽ',
+  'ề',
+  'Ề',
+  'ế',
+  'Ế',
+  'ể',
+  'Ể',
+  'ễ',
+  'Ễ',
+  'ệ',
+  'Ệ',
+  'ỉ',
+  'Ỉ',
+  'ị',
+  'Ị',
+  'ọ',
+  'Ọ',
+  'ỏ',
+  'Ỏ',
+  'ồ',
+  'Ồ',
+  'ổ',
+  'Ổ',
+  'ỗ',
+  'Ỗ',
+  'ộ',
+  'Ộ',
+  'ớ',
+  'Ớ',
+  'ờ',
+  'Ờ',
+  'ở',
+  'Ở',
+  'ỡ',
+  'Ỡ',
+  'ợ',
+  'Ợ',
+  'ụ',
+  'Ụ',
+  'ủ',
+  'Ủ',
+  'ứ',
+  'Ứ',
+  'ừ',
+  'Ừ',
+  'ử',
+  'Ử',
+  'ữ',
+  'Ữ',
+  'ự',
+  'Ự',
+  'ỳ',
+  'Ỳ',
+  'ỵ',
+  'Ỵ',
+  'ỷ',
+  'Ỷ',
+  'ỹ',
+  'Ỹ'
+]
+const chineseLetters = ['龘', '龍', '齉', '龠', '龔', '龖', '龍', '龎', '龑', '龏']
 const numbers = Array.from({ length: 10 }, () => Math.floor(Math.random() * 101))
+const specialCharacters = [
+  '!',
+  '@',
+  '#',
+  '$',
+  '%',
+  '^',
+  '&',
+  '*',
+  '(',
+  ')',
+  '-',
+  '_',
+  '=',
+  '+',
+  '[',
+  ']',
+  '{',
+  '}',
+  '|',
+  '\\',
+  ';',
+  ':',
+  "'",
+  '"',
+  ',',
+  '.',
+  '<',
+  '>',
+  '/',
+  '?'
+]
 
 export default {
   data() {
     return {
       scramble: false,
-      generatedPassword: ''
+      generatedPassword: '',
+      noWords: false
     }
   },
   methods: {
@@ -130,17 +257,31 @@ export default {
       return passwordArray.join('')
     },
     getRandomLanguageArray() {
-      const languageArrays = [
-        germanWords,
-        dutchWords,
-        chineseWords,
-        russianWords,
-        vietnameseWords,
-        koreanWords,
-        numbers
-      ]
-      const randomIndex = Math.floor(Math.random() * languageArrays.length)
-      return languageArrays[randomIndex]
+      if (this.noWords) {
+        const letterArrays = [
+          germanLetters,
+          dutchLetters,
+          vietnameseLetters,
+          chineseLetters,
+          numbers,
+          specialCharacters
+        ]
+        const randomIndex = Math.floor(Math.random() * letterArrays.length)
+        return letterArrays[randomIndex]
+      } else {
+        const languageArrays = [
+          germanWords,
+          dutchWords,
+          chineseWords,
+          russianWords,
+          vietnameseWords,
+          koreanWords,
+          numbers,
+          specialCharacters
+        ]
+        const randomIndex = Math.floor(Math.random() * languageArrays.length)
+        return languageArrays[randomIndex]
+      }
     },
     getRandomWord(languageArray) {
       const randomIndex = Math.floor(Math.random() * languageArray.length)
