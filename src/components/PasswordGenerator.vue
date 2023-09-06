@@ -1,12 +1,19 @@
 <template>
   <div>
-    <h1>Recon's Password Generator</h1>
-    <p>Click the button below to generate a secure password:</p>
-    <button @click="generatePassword">Generate Password</button>
-    <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
-    <!-- bind checkbox to 'scramble' data property -->
-    <label for="scrambleCheckbox">Scramble Password</label>
-    <div id="password">{{ generatedPassword }}</div>
+    <center>
+      <div class="container">
+        <h1>Recon's Password Generator</h1>
+        <p>Click the button below to generate a secure password:</p>
+        <button @click="generatePassword">Generate Password</button>
+        <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
+        <!-- bind checkbox to 'scramble' data property -->
+        <label for="scrambleCheckbox">Scramble Password</label>
+        <div id="password">{{ generatedPassword }}</div>
+      </div>
+      <div class="footer">
+        <p>Current Version: v1.0.0</p>
+      </div>
+    </center>
   </div>
 </template>
 
