@@ -12,13 +12,15 @@
         <div id="password">{{ generatedPassword }}</div>
       </div>
       <div class="footer">
-        <p>Current Version: v1.0.0</p>
+        <p>Current Version: {{ appVersion }}</p>
       </div>
     </center>
   </div>
 </template>
 
 <script>
+import packageJson from '/package.json'
+
 const germanWords = [
   'Apfel',
   'Haus',
@@ -202,6 +204,11 @@ export default {
       scramble: false,
       generatedPassword: '',
       noWords: false
+    }
+  },
+  computed: {
+    appVersion() {
+      return packageJson.version
     }
   },
   methods: {
