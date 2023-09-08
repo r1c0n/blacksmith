@@ -227,6 +227,13 @@ export default {
       }
 
       this.generatedPassword = password
+
+      // log debug information
+      console.log('Generated Password:', password)
+      console.log('Password Length:', password.length)
+      console.log('Scramble:', this.scramble)
+      console.log('No Words:', this.noWords)
+      console.log('App Version:', this.appVersion)
     },
     scramblePassword(password) {
       const passwordArray = password.split('')
