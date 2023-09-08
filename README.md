@@ -1,4 +1,4 @@
-# recons-pwd-gen
+# Recon's Password Generator
 
 ## Recommended IDE Setup
 
