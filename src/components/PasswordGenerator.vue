@@ -12,7 +12,7 @@
         <div id="password">{{ generatedPassword }}</div>
       </div>
       <div class="footer">
-        <p>Current Version: {{ appVersion }}</p>
+        <p>Current Version: {{ appVersion }} | <a href="./sites.html">Websites</a></p>
       </div>
     </center>
   </div>
