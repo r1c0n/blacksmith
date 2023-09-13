@@ -11,7 +11,7 @@
         <div id="password">{{ generatedPassword }}</div>
       </div>
       <div class="footer">
-        <p>Current Version: v1.0.0</p>
+        <p>Current Version: v1.0.0 | <a href="./sites.html">Websites</a></p>
       </div>
     </center>
   </div>
