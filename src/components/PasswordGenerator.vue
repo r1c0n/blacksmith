@@ -10,11 +10,11 @@
           <div class="dropdown-content">
             <label>
               <input type="checkbox" v-model="scramble" />
-              Scramble Password
+              Scramble
             </label>
             <label>
               <input type="checkbox" v-model="noWords" />
-              No Words
+              Letters
             </label>
             <hr />
             <label v-for="(value, key) in includeLanguages" :key="key">
