@@ -11,7 +11,6 @@
           <label> <input type="checkbox" v-model="includeLanguages.dutch" /> Dutch </label>
           <label> <input type="checkbox" v-model="includeLanguages.viet" /> Vietnamese </label>
           <label> <input type="checkbox" v-model="includeLanguages.chinese" /> Chinese </label>
-          <label> <input type="checkbox" v-model="includeLanguages.korean" /> Korean </label>
           <label> <input type="checkbox" v-model="includeLanguages.russian" /> Russian </label>
 
           <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
@@ -45,7 +44,6 @@ export default {
         dutch: true,
         viet: true,
         chinese: true,
-        korean: true,
         russian: true
       }
     }
@@ -145,7 +143,6 @@ export default {
           { name: 'chinese', array: languages.words.chinese },
           { name: 'russian', array: languages.words.russian },
           { name: 'viet', array: languages.words.viet },
-          { name: 'korean', array: languages.words.korean },
           { name: 'specialCharacters', array: languages.specialCharacters },
           { name: 'numbers', array: languages.numbers }
         ]

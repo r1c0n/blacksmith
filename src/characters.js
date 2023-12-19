@@ -8,8 +8,7 @@ export const languages = {
     dutch: ['Huis', 'Appel', 'Auto', 'Tafel', 'Taart', 'Stoel', 'Bloem', 'Raam', 'Tuin', 'Water'],
     chinese: ['苹果', '家', '汽车', '桌子', '蛋糕', '椅子', '花', '窗户', '花园', '水'],
     russian: ['Дом', 'Яблоко', 'Машина', 'Стол', 'Пирог', 'Стул', 'Цветок', 'Окно', 'Сад', 'Вода'],
-    viet: ['Nhà', 'Quả táo', 'Xe hơi', 'Bàn', 'Bánh', 'Ghế', 'Hoa', 'Cửa sổ', 'Vườn', 'Nước'],
-    korean: ['집', '사과', '자동차', '테이블', '케이크', '의자', '꽃', '창문', '정원', '물']
+    viet: ['Nhà', 'Quả táo', 'Xe hơi', 'Bàn', 'Bánh', 'Ghế', 'Hoa', 'Cửa sổ', 'Vườn', 'Nước']
   },
   letters: {
     english: english.letters,
