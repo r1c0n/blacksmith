@@ -5,6 +5,7 @@
         <h1>Recon's Password Generator</h1>
         <p>Click the button below to generate a secure password.</p>
         <button @click="generatePassword">Generate Password</button>
+        <div class="gen"></div>
         <div class="dropdown">
           <button class="dropbtn">Language Options</button>
           <div class="dropdown-content">
