@@ -8,7 +8,6 @@
         <div>
           <label> <input type="checkbox" v-model="includeLanguages.english" /> English </label>
           <label> <input type="checkbox" v-model="includeLanguages.german" /> German </label>
-          <label> <input type="checkbox" v-model="includeLanguages.dutch" /> Dutch </label>
           <label> <input type="checkbox" v-model="includeLanguages.viet" /> Vietnamese </label>
           <label> <input type="checkbox" v-model="includeLanguages.chinese" /> Chinese </label>
           <label> <input type="checkbox" v-model="includeLanguages.russian" /> Russian </label>
@@ -45,7 +44,6 @@ export default {
       includeLanguages: {
         english: true,
         german: true,
-        dutch: true,
         viet: true,
         chinese: true,
         russian: true,
@@ -133,7 +131,6 @@ export default {
         const letterArrays = [
           { name: 'english', array: languages.letters.english },
           { name: 'german', array: languages.letters.german },
-          { name: 'dutch', array: languages.letters.dutch },
           { name: 'viet', array: languages.letters.viet },
           { name: 'chinese', array: languages.letters.chinese },
           { name: 'specialchars', array: languages.specialCharacters },
@@ -145,7 +142,6 @@ export default {
         const languageArrays = [
           { name: 'english', array: languages.words.english },
           { name: 'german', array: languages.words.german },
-          { name: 'dutch', array: languages.words.dutch },
           { name: 'chinese', array: languages.words.chinese },
           { name: 'russian', array: languages.words.russian },
           { name: 'viet', array: languages.words.viet },
