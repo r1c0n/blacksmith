@@ -18,7 +18,8 @@
             </label>
             <hr />
             <label v-for="(value, key) in includeLanguages" :key="key">
-              <input type="checkbox" v-model="includeLanguages[key]" /> {{ key }}
+              <input type="checkbox" v-model="includeLanguages[key]" />
+              {{ getDisplayText(key) }}
             </label>
           </div>
         </div>
@@ -162,6 +163,16 @@ export default {
     getRandomWord(languageArray) {
       const randomIndex = Math.floor(Math.random() * languageArray.array.length)
       return languageArray.array[randomIndex]
+    },
+    capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1)
+    },
+    getDisplayText(key) {
+      if (key === 'specialchars') {
+        return 'Special'
+      } else {
+        return this.capitalizeFirstLetter(key)
+      }
     }
   }
 }
