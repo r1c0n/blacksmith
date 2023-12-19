@@ -1,17 +1,10 @@
+import { english } from './lang/english'
+import { german } from './lang/german'
+
 export const languages = {
   words: {
-    german: [
-      'Apfel',
-      'Haus',
-      'Auto',
-      'Tisch',
-      'Kuchen',
-      'Stuhl',
-      'Blume',
-      'Fenster',
-      'Garten',
-      'Wasser'
-    ],
+    english: english.words,
+    german: german.words,
     dutch: ['Huis', 'Appel', 'Auto', 'Tafel', 'Taart', 'Stoel', 'Bloem', 'Raam', 'Tuin', 'Water'],
     chinese: ['苹果', '家', '汽车', '桌子', '蛋糕', '椅子', '花', '窗户', '花园', '水'],
     russian: ['Дом', 'Яблоко', 'Машина', 'Стол', 'Пирог', 'Стул', 'Цветок', 'Окно', 'Сад', 'Вода'],
@@ -19,7 +12,8 @@ export const languages = {
     korean: ['집', '사과', '자동차', '테이블', '케이크', '의자', '꽃', '창문', '정원', '물']
   },
   letters: {
-    german: ['ä', 'Ä', 'ö', 'Ö', 'ü', 'Ü', 'ß'],
+    english: english.letters,
+    german: german.letters,
     dutch: ['ä', 'Ä', 'ë', 'Ë', 'ï', 'Ï', 'ö', 'Ö', 'ü', 'Ü', 'ÿ', 'Ÿ'],
     viet: [
       'ạ',
