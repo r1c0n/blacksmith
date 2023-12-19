@@ -5,22 +5,22 @@
         <h1>Recon's Password Generator</h1>
         <p>Click the button below to generate a secure password.</p>
         <button @click="generatePassword">Generate Password</button>
-        <div>
-          <label> <input type="checkbox" v-model="includeLanguages.english" /> English </label>
-          <label> <input type="checkbox" v-model="includeLanguages.german" /> German </label>
-          <label> <input type="checkbox" v-model="includeLanguages.viet" /> Vietnamese </label>
-          <label> <input type="checkbox" v-model="includeLanguages.chinese" /> Chinese </label>
-          <label> <input type="checkbox" v-model="includeLanguages.russian" /> Russian </label>
-          <label> <input type="checkbox" v-model="includeLanguages.numbers" /> Numbers </label>
-          <label>
-            <input type="checkbox" v-model="includeLanguages.specialchars" /> Special Characters
-          </label>
-
-          <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
-          <label for="scrambleCheckbox">Scramble Password</label>
-
-          <input type="checkbox" id="noWordsCheckbox" v-model="noWords" />
-          <label for="noWordsCheckbox">No Words</label>
+        <div class="dropdown">
+          <button class="dropbtn">Language Options</button>
+          <div class="dropdown-content">
+            <label>
+              <input type="checkbox" v-model="scramble" />
+              Scramble Password
+            </label>
+            <label>
+              <input type="checkbox" v-model="noWords" />
+              No Words
+            </label>
+            <hr />
+            <label v-for="(value, key) in includeLanguages" :key="key">
+              <input type="checkbox" v-model="includeLanguages[key]" /> {{ key }}
+            </label>
+          </div>
         </div>
         <div id="password">{{ generatedPassword }}</div>
       </div>
