@@ -39,6 +39,7 @@ export default {
     generatePassword() {
       const passwordLength = Math.floor(Math.random() * 50) + 50 // random length up to 100 characters
       let password = ''
+      this.usedWords = []
 
       // ensure the password meets the criteria
       let lowercaseCount = 0
@@ -55,6 +56,9 @@ export default {
         }
 
         password += randomWord
+        if (languageArray !== languages.specialCharacters && languageArray !== languages.numbers) {
+          this.usedWords.push(randomWord)
+        }
       }
 
       // remove spaces from the password
@@ -84,6 +88,7 @@ export default {
       console.log('Password Length:', password.length)
       console.log('Scramble:', this.scramble)
       console.log('No Words:', this.noWords)
+      console.log('Used Words:', this.usedWords)
       console.log('App Version:', this.appVersion)
     },
     scramblePassword(password) {
