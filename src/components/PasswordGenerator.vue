@@ -5,10 +5,19 @@
         <h1>Recon's Password Generator</h1>
         <p>Click the button below to generate a secure password.</p>
         <button @click="generatePassword">Generate Password</button>
-        <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
-        <label for="scrambleCheckbox">Scramble Password</label>
-        <input type="checkbox" id="noWordsCheckbox" v-model="noWords" />
-        <label for="noWordsCheckbox">No Words</label>
+        <div>
+          <label> <input type="checkbox" v-model="includeLanguages.english" /> English </label>
+          <label> <input type="checkbox" v-model="includeLanguages.german" /> German </label>
+          <label> <input type="checkbox" v-model="includeLanguages.dutch" /> Dutch </label>
+          <label> <input type="checkbox" v-model="includeLanguages.viet" /> Vietnamese </label>
+          <label> <input type="checkbox" v-model="includeLanguages.chinese" /> Chinese </label>
+
+          <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
+          <label for="scrambleCheckbox">Scramble Password</label>
+
+          <input type="checkbox" id="noWordsCheckbox" v-model="noWords" />
+          <label for="noWordsCheckbox">No Words</label>
+        </div>
         <div id="password">{{ generatedPassword }}</div>
       </div>
       <div class="footer">
@@ -27,7 +36,14 @@ export default {
     return {
       scramble: false,
       generatedPassword: '',
-      noWords: false
+      noWords: false,
+      includeLanguages: {
+        english: true,
+        german: true,
+        dutch: true,
+        viet: true,
+        chinese: true
+      }
     }
   },
   computed: {
@@ -45,22 +61,27 @@ export default {
       let lowercaseCount = 0
       while (password.length < passwordLength) {
         const languageArray = this.getRandomLanguageArray()
-        const randomWord = this.getRandomWord(languageArray)
 
-        // add a random special character with a 10% chance
-        if (Math.random() < 0.1) {
-          const randomSpecialChar = '!@#$%^&*()_-+=<>?'[
-            Math.floor(Math.random() * '!@#$%^&*()_-+=<>?'.length)
-          ]
-          password += randomSpecialChar
-        }
+        if (this.includeLanguages[languageArray.name]) {
+          const randomWord = this.getRandomWord(languageArray)
 
-        password += randomWord
-        if (languageArray !== languages.specialCharacters && languageArray !== languages.numbers) {
-          this.usedWords.push(randomWord)
+          // add a random special character with a 10% chance
+          if (Math.random() < 0.1) {
+            const randomSpecialChar = '!@#$%^&*()_-+=<>?'[
+              Math.floor(Math.random() * '!@#$%^&*()_-+=<>?'.length)
+            ]
+            password += randomSpecialChar
+          }
+
+          password += randomWord
+          if (
+            languageArray !== languages.specialCharacters &&
+            languageArray !== languages.numbers
+          ) {
+            this.usedWords.push(randomWord)
+          }
         }
       }
-
       // remove spaces from the password
       password = password.replace(/\s+/g, '')
 
@@ -102,33 +123,35 @@ export default {
     getRandomLanguageArray() {
       if (this.noWords) {
         const letterArrays = [
-          languages.letters.german,
-          languages.letters.dutch,
-          languages.letters.viet,
-          languages.letters.chinese,
-          languages.specialCharacters,
-          languages.numbers
+          { name: 'english', array: languages.letters.english },
+          { name: 'german', array: languages.letters.german },
+          { name: 'dutch', array: languages.letters.dutch },
+          { name: 'viet', array: languages.letters.viet },
+          { name: 'chinese', array: languages.letters.chinese },
+          { name: 'specialCharacters', array: languages.specialCharacters },
+          { name: 'numbers', array: languages.numbers }
         ]
         const randomIndex = Math.floor(Math.random() * letterArrays.length)
         return letterArrays[randomIndex]
       } else {
         const languageArrays = [
-          languages.words.german,
-          languages.words.dutch,
-          languages.words.chinese,
-          languages.words.russian,
-          languages.words.viet,
-          languages.words.korean,
-          languages.specialCharacters,
-          languages.numbers
+          { name: 'english', array: languages.words.english },
+          { name: 'german', array: languages.words.german },
+          { name: 'dutch', array: languages.words.dutch },
+          { name: 'chinese', array: languages.words.chinese },
+          { name: 'russian', array: languages.words.russian },
+          { name: 'viet', array: languages.words.viet },
+          { name: 'korean', array: languages.words.korean },
+          { name: 'specialCharacters', array: languages.specialCharacters },
+          { name: 'numbers', array: languages.numbers }
         ]
         const randomIndex = Math.floor(Math.random() * languageArrays.length)
         return languageArrays[randomIndex]
       }
     },
     getRandomWord(languageArray) {
-      const randomIndex = Math.floor(Math.random() * languageArray.length)
-      return languageArray[randomIndex]
+      const randomIndex = Math.floor(Math.random() * languageArray.array.length)
+      return languageArray.array[randomIndex]
     }
   }
 }
