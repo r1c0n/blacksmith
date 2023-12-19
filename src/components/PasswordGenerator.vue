@@ -12,6 +12,10 @@
           <label> <input type="checkbox" v-model="includeLanguages.viet" /> Vietnamese </label>
           <label> <input type="checkbox" v-model="includeLanguages.chinese" /> Chinese </label>
           <label> <input type="checkbox" v-model="includeLanguages.russian" /> Russian </label>
+          <label> <input type="checkbox" v-model="includeLanguages.numbers" /> Numbers </label>
+          <label>
+            <input type="checkbox" v-model="includeLanguages.specialchars" /> Special Characters
+          </label>
 
           <input type="checkbox" id="scrambleCheckbox" v-model="scramble" />
           <label for="scrambleCheckbox">Scramble Password</label>
@@ -44,7 +48,9 @@ export default {
         dutch: true,
         viet: true,
         chinese: true,
-        russian: true
+        russian: true,
+        numbers: true,
+        specialchars: true
       }
     }
   },
@@ -67,8 +73,8 @@ export default {
         if (this.includeLanguages[languageArray.name]) {
           const randomWord = this.getRandomWord(languageArray)
 
-          // add a random special character with a 10% chance
-          if (Math.random() < 0.1) {
+          // check if special characters checkbox is checked
+          if (languageArray.name === 'specialchars' && Math.random() < 0.1) {
             const randomSpecialChar = '!@#$%^&*()_-+=<>?'[
               Math.floor(Math.random() * '!@#$%^&*()_-+=<>?'.length)
             ]
@@ -130,7 +136,7 @@ export default {
           { name: 'dutch', array: languages.letters.dutch },
           { name: 'viet', array: languages.letters.viet },
           { name: 'chinese', array: languages.letters.chinese },
-          { name: 'specialCharacters', array: languages.specialCharacters },
+          { name: 'specialchars', array: languages.specialCharacters },
           { name: 'numbers', array: languages.numbers }
         ]
         const randomIndex = Math.floor(Math.random() * letterArrays.length)
@@ -143,7 +149,7 @@ export default {
           { name: 'chinese', array: languages.words.chinese },
           { name: 'russian', array: languages.words.russian },
           { name: 'viet', array: languages.words.viet },
-          { name: 'specialCharacters', array: languages.specialCharacters },
+          { name: 'specialchars', array: languages.specialCharacters },
           { name: 'numbers', array: languages.numbers }
         ]
         const randomIndex = Math.floor(Math.random() * languageArrays.length)
