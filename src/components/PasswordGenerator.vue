@@ -59,6 +59,13 @@ export default {
   },
   methods: {
     generatePassword() {
+      // check if no language is selected
+      const allLanguagesUnchecked = Object.values(this.includeLanguages).every((value) => !value)
+
+      if (allLanguagesUnchecked) {
+        this.includeLanguages.english = true // default to english
+      }
+
       const passwordLength = Math.floor(Math.random() * 50) + 50 // random length up to 100 characters
       let password = ''
       this.usedWords = []
