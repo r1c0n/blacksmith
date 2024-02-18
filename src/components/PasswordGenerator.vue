@@ -17,6 +17,9 @@
           <p class="status-bar-field">Version: v{{ appVersion }}</p>
           <p class="status-bar-field" v-if="latestRelease">Release: {{ latestRelease.tag_name }}</p>
           <p class="status-bar-field">{{ commitCount }} Commits</p>
+          <p class="status-bar-field">
+            <a href="https://github.com/{{ owner }}/{{ repo }}">{{ owner }}/{{ repo }}</a>
+          </p>
         </div>
       </div>
       <br />
