@@ -1,4 +1,4 @@
-# Recon's Password Generator
+# Blacksmith
 
 ## Recommended IDE Setup
 
