@@ -25,6 +25,9 @@
         </div>
         <div class="window-body">
           <div class="field-row">
+            <button @click="resetSettings">Default</button>
+          </div>
+          <div class="field-row">
             <input checked type="checkbox" id="scrambleInput" v-model="scramble" />
             <label for="scrambleInput">Scramble</label>
           </div>
@@ -67,6 +70,7 @@
 <script>
 import { languages } from '../characters.js'
 import packageJson from '/package.json'
+import VueCookies from 'vue-cookies'
 
 export default {
   data() {
@@ -221,6 +225,52 @@ export default {
         this.isMainInactive = true
         this.isSettingsInactive = false
       }
+    },
+    saveSettingsToCookie() {
+      VueCookies.set('settings', {
+        scramble: this.scramble,
+        noWords: this.noWords,
+        includeLanguages: this.includeLanguages,
+        passwordLength: this.passwordLength,
+        randomLength: this.randomLength
+      })
+    },
+    loadSettingsFromCookie() {
+      const settings = VueCookies.get('settings')
+      if (settings) {
+        this.scramble = settings.scramble
+        this.noWords = settings.noWords
+        this.includeLanguages = settings.includeLanguages
+        this.passwordLength = settings.passwordLength
+        this.randomLength = settings.randomLength
+      }
+    },
+    resetSettings() {
+      VueCookies.remove('settings')
+      window.location.reload()
+    }
+  },
+  mounted() {
+    this.loadSettingsFromCookie()
+  },
+  watch: {
+    scramble() {
+      this.saveSettingsToCookie()
+    },
+    noWords() {
+      this.saveSettingsToCookie()
+    },
+    includeLanguages: {
+      handler() {
+        this.saveSettingsToCookie()
+      },
+      deep: true
+    },
+    passwordLength() {
+      this.saveSettingsToCookie()
+    },
+    randomLength() {
+      this.saveSettingsToCookie()
     }
   }
 }
