@@ -34,7 +34,7 @@
           </div>
           <br />
           <fieldset>
-            <div class="field-row">Language Selection:</div>
+            <legend>Language Selection:</legend>
             <div class="field-row">
               <label v-for="(value, key) in includeLanguages" :key="key" class="checkbox">
                 <input type="checkbox" :id="'language_' + key" v-model="includeLanguages[key]" />
