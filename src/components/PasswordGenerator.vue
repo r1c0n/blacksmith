@@ -15,6 +15,8 @@
         </div>
         <div class="status-bar">
           <p class="status-bar-field">Version: v{{ appVersion }}</p>
+          <p class="status-bar-field" v-if="latestRelease">Release: {{ latestRelease.tag_name }}</p>
+          <p class="status-bar-field">{{ commitCount }} Commits</p>
         </div>
       </div>
       <br />
@@ -71,6 +73,7 @@
 import { languages } from '../characters.js'
 import packageJson from '/package.json'
 import VueCookies from 'vue-cookies'
+import axios from 'axios'
 
 export default {
   data() {
@@ -90,7 +93,13 @@ export default {
       isMainInactive: false,
       isSettingsInactive: true,
       passwordLength: 64,
-      randomLength: false
+      randomLength: false,
+      latestRelease: null,
+      ghAPI: 'https://api.github.com',
+      owner: 'r1c0n',
+      repo: 'blacksmith',
+      sha: 'master',
+      commitCount: null
     }
   },
   computed: {
@@ -248,10 +257,60 @@ export default {
     resetSettings() {
       VueCookies.remove('settings')
       window.location.reload()
+    },
+    fetchLatestRelease() {
+      axios
+        .get('https://api.github.com/repos/r1c0n/blacksmith/releases/latest')
+        .then((response) => {
+          this.latestRelease = response.data
+        })
+        .catch((error) => {
+          console.error('Error fetching latest release:', error)
+        })
+    },
+    // https://gist.github.com/yershalom/a7c08f9441d1aadb13777bce4c7cdc3b?permalink_comment_id=3278742#gistcomment-3278742
+    httpGet(theUrl, returnHeaders) {
+      var xmlHttp = new XMLHttpRequest()
+      xmlHttp.open('GET', theUrl, false) // false for synchronous request
+      xmlHttp.send(null)
+      if (returnHeaders) {
+        return xmlHttp
+      }
+      return xmlHttp.responseText
+    },
+    getCommitsCount() {
+      let firstCommit = this.getFirstCommit()
+      let compareUrl = `${this.ghAPI}/repos/${this.owner}/${this.repo}/compare/${firstCommit}...${this.sha}`
+      let commitReq = this.httpGet(compareUrl)
+      let commitCount = JSON.parse(commitReq)['total_commits'] + 1
+      console.log('Commit Count: ', commitCount)
+      this.commitCount = commitCount
+    },
+    getFirstCommit() {
+      let url = `${this.ghAPI}/repos/${this.owner}/${this.repo}/commits`
+      let req = this.httpGet(url, true)
+      let firstCommitHash = ''
+      if (req.getResponseHeader('Link')) {
+        let pageUrl = req
+          .getResponseHeader('Link')
+          .split(',')[1]
+          .split(';')[0]
+          .split('<')[1]
+          .split('>')[0]
+        let reqLastCommit = this.httpGet(pageUrl)
+        let firstCommit = JSON.parse(reqLastCommit)
+        firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
+      } else {
+        let firstCommit = JSON.parse(req.responseText)
+        firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
+      }
+      return firstCommitHash
     }
   },
   mounted() {
     this.loadSettingsFromCookie()
+    this.fetchLatestRelease()
+    this.getCommitsCount(this.owner, this.repo, this.sha)
   },
   watch: {
     scramble() {
