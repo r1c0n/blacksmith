@@ -18,7 +18,7 @@
           <p class="status-bar-field" v-if="latestRelease">Release: {{ latestRelease.tag_name }}</p>
           <p class="status-bar-field">{{ commitCount }} Commits</p>
           <p class="status-bar-field">
-            <a href="https://github.com/{{ owner }}/{{ repo }}">{{ owner }}/{{ repo }}</a>
+            <a href="https://github.com/r1c0n/blacksmith">{{ owner }}/{{ repo }}</a>
           </p>
         </div>
       </div>
