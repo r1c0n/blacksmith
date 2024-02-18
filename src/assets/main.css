@@ -1,130 +1,21 @@
-.container {
-  width: 80%;
-  max-width: 700px;
-  padding: 20px;
-  background-color: transparent;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  text-align: center;
-  position: relative;
-}
-
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f0f0;
+  background-image: url('./bg.png');
 }
 
-#password {
-  font-size: 16px;
-  padding: 15px;
-  border: 2px solid #007bff;
-  margin: 20px 0;
-  background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  overflow-wrap: break-word;
+.nuhuh {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-button {
-  font-size: 20px;
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.footer {
-  bottom: 0;
-  font-weight: bold;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropbtn {
-  background-color: #007bff;
-  color: white;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.dropbtn:hover {
-  background-color: #0056b3;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  z-index: 1;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.dropdown-content label {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  opacity: 0;
-  animation: fadeInOption 0.3s ease forwards;
-}
-
-.dropdown-content label input {
-  margin-right: 10px;
-}
-
-@keyframes fadeInOption {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.dropdown-content label:hover {
-  background-color: #f0f0f0;
-}
-
-.dropdown-content hr {
-  margin: 5px 0;
-  border: none;
-  border-top: 1px solid #ddd;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
+.window {
+  overflow: hidden;
 }
 
 .gen {
-  margin-bottom: 5px;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }

@@ -1,33 +1,50 @@
 <template>
   <div>
     <center>
-      <div class="container">
-        <h1>Recon's Password Generator</h1>
-        <p>Click the button below to generate a secure password.</p>
-        <button @click="generatePassword">Generate Password</button>
-        <div class="gen"></div>
-        <div class="dropdown">
-          <button class="dropbtn">Language Options</button>
-          <div class="dropdown-content">
-            <label>
-              <input type="checkbox" v-model="scramble" />
-              Scramble
-            </label>
-            <label>
-              <input type="checkbox" v-model="noWords" />
-              Letters
-            </label>
-            <hr />
-            <label v-for="(value, key) in includeLanguages" :key="key">
-              <input type="checkbox" v-model="includeLanguages[key]" />
-              {{ getDisplayText(key) }}
-            </label>
-          </div>
+      <!-- Main Window -->
+      <div class="window" style="width: 320px" @click="activateWindow('main')">
+        <div :class="['title-bar nuhuh', { inactive: isMainInactive }]">
+          <div class="title-bar-text">Blacksmith</div>
         </div>
-        <div id="password">{{ generatedPassword }}</div>
+        <div class="window-body">
+          <p class="nuhuh">Click "Generate Password" to generate your secure password!</p>
+          <button @click="generatePassword">Generate Password</button>
+          <br />
+          <div class="gen"></div>
+          <div id="password">{{ generatedPassword }}</div>
+        </div>
+        <div class="status-bar">
+          <p class="status-bar-field">Version: v{{ appVersion }}</p>
+        </div>
       </div>
-      <div class="footer">
-        <p>Current Version: {{ appVersion }}</p>
+      <br />
+      <!-- Settings Window -->
+      <div class="window nuhuh" style="width: 320px" @click="activateWindow('settings')">
+        <div :class="['title-bar', { inactive: isSettingsInactive }]">
+          <div class="title-bar-text">Blacksmith Settings</div>
+        </div>
+        <div class="window-body">
+          <div class="field-row">
+            <input checked type="checkbox" id="scrambleInput" v-model="scramble" />
+            <label for="scrambleInput">Scramble</label>
+          </div>
+          <div class="field-row">
+            <input checked type="checkbox" id="noWordsInput" v-model="noWords" />
+            <label for="noWordsInput">No Words</label>
+          </div>
+          <br />
+          <fieldset>
+            <div class="field-row">Language Selection:</div>
+            <div class="field-row">
+              <label v-for="(value, key) in includeLanguages" :key="key" class="checkbox">
+                <input type="checkbox" :id="'language_' + key" v-model="includeLanguages[key]" />
+                <span class="checkbox-text">
+                  {{ includeLanguages[key] ? '✓ ' : '' }}{{ getDisplayText(key) }}
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
       </div>
     </center>
   </div>
@@ -51,7 +68,9 @@ export default {
         russian: true,
         numbers: true,
         specialchars: true
-      }
+      },
+      isMainInactive: false,
+      isSettingsInactive: true
     }
   },
   computed: {
@@ -173,6 +192,15 @@ export default {
         return 'Special'
       } else {
         return this.capitalizeFirstLetter(key)
+      }
+    },
+    activateWindow(window) {
+      if (window === 'main') {
+        this.isMainInactive = false
+        this.isSettingsInactive = true
+      } else if (window === 'settings') {
+        this.isMainInactive = true
+        this.isSettingsInactive = false
       }
     }
   }

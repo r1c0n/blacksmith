@@ -10,6 +10,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "98.css": "^0.1.20",
     "vue": "^3.3.4"
   },
   "devDependencies": {
