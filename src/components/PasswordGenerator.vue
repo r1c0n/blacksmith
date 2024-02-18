@@ -8,10 +8,10 @@
         </div>
         <div class="window-body">
           <p class="nuhuh">Click "Generate Password" to generate your secure password!</p>
-          <button @click="generatePassword">Generate Password</button>
-          <br />
-          <div class="gen"></div>
-          <div id="password">{{ generatedPassword }}</div>
+          <button @click="generatePassword" style="margin-bottom: 10px">Generate Password</button>
+          <ul class="tree-view">
+            <li id="password">{{ generatedPassword }}</li>
+          </ul>
         </div>
         <div class="status-bar">
           <p class="status-bar-field">Version: v{{ appVersion }}</p>
@@ -31,6 +31,20 @@
           <div class="field-row">
             <input checked type="checkbox" id="noWordsInput" v-model="noWords" />
             <label for="noWordsInput">No Words</label>
+          </div>
+          <div class="field-row">
+            <input checked type="checkbox" id="randomLengthInput" v-model="randomLength" />
+            <label for="randomLengthInput">Random Length</label>
+          </div>
+          <br />
+          <div class="field-row">
+            <label for="text17">Length</label>
+            <input
+              id="text17"
+              type="text"
+              v-model.number="passwordLength"
+              :disabled="randomLength"
+            />
           </div>
           <br />
           <fieldset>
@@ -70,7 +84,9 @@ export default {
         specialchars: true
       },
       isMainInactive: false,
-      isSettingsInactive: true
+      isSettingsInactive: true,
+      passwordLength: 64,
+      randomLength: false
     }
   },
   computed: {
@@ -87,7 +103,10 @@ export default {
         this.includeLanguages.english = true // default to english
       }
 
-      const passwordLength = Math.floor(Math.random() * 50) + 50 // random length up to 100 characters
+      let passwordLength = this.passwordLength
+      if (this.randomLength) {
+        passwordLength = Math.floor(Math.random() * 50) + 50 // random length up to 100 characters
+      }
       let password = ''
       this.usedWords = []
 
