@@ -1,4 +1,4 @@
-# recons-pwd-gen
+# Blacksmith
 
 ## Recommended IDE Setup
 

@@ -1,46 +1,21 @@
-.container {
-  width: 80%;
-  max-width: 700px;
-  padding: 20px;
-  background-color: transparent;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  text-align: center;
-  position: relative;
-}
-
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  background-image: url('./bg.png');
 }
 
-#password {
-  font-size: 24px;
-  padding: 15px;
-  border: 2px solid #007bff;
-  margin: 20px 0;
-  background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
+.nuhuh {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.window {
+  overflow: hidden;
+}
+
+.gen {
+  max-width: 100%;
   overflow-wrap: break-word;
-}
-
-button {
-  font-size: 20px;
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.footer {
-  bottom: 0;
-  font-weight: bold;
 }
