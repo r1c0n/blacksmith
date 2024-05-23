@@ -3,9 +3,7 @@
     <center>
       <!-- Main Window -->
       <div class="window" style="width: 320px" @click="activateWindow('main')">
-        <div :class="['title-bar nuhuh', { inactive: isMainInactive }]">
-          <div class="title-bar-text">Blacksmith</div>
-        </div>
+        <TitleBar :title="'Blacksmith'" :inactive="isMainInactive" />
         <div class="window-body">
           <p class="nuhuh">Click "Generate Password" to generate your secure password!</p>
           <button @click="generatePassword" style="margin-bottom: 10px">Generate Password</button>
@@ -25,9 +23,7 @@
       <br />
       <!-- Settings Window -->
       <div class="window nuhuh" style="width: 320px" @click="activateWindow('settings')">
-        <div :class="['title-bar', { inactive: isSettingsInactive }]">
-          <div class="title-bar-text">Blacksmith Settings</div>
-        </div>
+        <TitleBar :title="'Blacksmith Settings'" :inactive="isSettingsInactive" />
         <div class="window-body">
           <div class="field-row">
             <button @click="resetSettings">Default</button>
@@ -74,11 +70,15 @@
 
 <script>
 import { languages } from '../characters.js'
+import TitleBar from './TitleBar.vue'
 import packageJson from '/package.json'
 import VueCookies from 'vue-cookies'
 import axios from 'axios'
 
 export default {
+  components: {
+    TitleBar
+  },
   data() {
     return {
       scramble: false,
@@ -108,7 +108,8 @@ export default {
   computed: {
     appVersion() {
       return packageJson.version
-    }
+    },
+    title: String
   },
   methods: {
     generatePassword() {
