@@ -3,9 +3,7 @@
     <center>
       <!-- Main Window -->
       <div class="window" style="width: 320px" @click="activateWindow('main')">
-        <div :class="['title-bar nuhuh', { inactive: isMainInactive }]">
-          <div class="title-bar-text">Blacksmith</div>
-        </div>
+        <TitleBar :title="'Blacksmith'" :inactive="isMainInactive" />
         <div class="window-body">
           <p class="nuhuh">Click "Generate Password" to generate your secure password!</p>
           <button @click="generatePassword" style="margin-bottom: 10px">Generate Password</button>
@@ -25,16 +23,10 @@
       <br />
       <!-- Settings Window -->
       <div class="window nuhuh" style="width: 320px" @click="activateWindow('settings')">
-        <div :class="['title-bar', { inactive: isSettingsInactive }]">
-          <div class="title-bar-text">Blacksmith Settings</div>
-        </div>
+        <TitleBar :title="'Blacksmith Settings'" :inactive="isSettingsInactive" />
         <div class="window-body">
           <div class="field-row">
             <button @click="resetSettings">Default</button>
-          </div>
-          <div class="field-row">
-            <input checked type="checkbox" id="scrambleInput" v-model="scramble" />
-            <label for="scrambleInput">Scramble</label>
           </div>
           <div class="field-row">
             <input checked type="checkbox" id="noWordsInput" v-model="noWords" />
@@ -74,14 +66,17 @@
 
 <script>
 import { languages } from '../characters.js'
+import TitleBar from './TitleBar.vue'
 import packageJson from '/package.json'
 import VueCookies from 'vue-cookies'
 import axios from 'axios'
 
 export default {
+  components: {
+    TitleBar
+  },
   data() {
     return {
-      scramble: false,
       generatedPassword: '',
       noWords: false,
       includeLanguages: {
@@ -108,7 +103,8 @@ export default {
   computed: {
     appVersion() {
       return packageJson.version
-    }
+    },
+    title: String
   },
   methods: {
     generatePassword() {
@@ -166,28 +162,14 @@ export default {
       }
       password = passwordArray.join('')
 
-      // check if the scramble checkbox is checked
-      if (this.scramble) {
-        password = this.scramblePassword(password)
-      }
-
       this.generatedPassword = password
 
       // log debug information
       console.log('Generated Password:', password)
       console.log('Password Length:', password.length)
-      console.log('Scramble:', this.scramble)
       console.log('No Words:', this.noWords)
       console.log('Used Words:', this.usedWords)
       console.log('App Version:', this.appVersion)
-    },
-    scramblePassword(password) {
-      const passwordArray = password.split('')
-      for (let i = passwordArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[passwordArray[i], passwordArray[j]] = [passwordArray[j], passwordArray[i]] // swap characters
-      }
-      return passwordArray.join('')
     },
     getRandomLanguageArray() {
       if (this.noWords) {
@@ -240,7 +222,6 @@ export default {
     },
     saveSettingsToCookie() {
       VueCookies.set('settings', {
-        scramble: this.scramble,
         noWords: this.noWords,
         includeLanguages: this.includeLanguages,
         passwordLength: this.passwordLength,
@@ -250,7 +231,6 @@ export default {
     loadSettingsFromCookie() {
       const settings = VueCookies.get('settings')
       if (settings) {
-        this.scramble = settings.scramble
         this.noWords = settings.noWords
         this.includeLanguages = settings.includeLanguages
         this.passwordLength = settings.passwordLength
@@ -316,9 +296,6 @@ export default {
     this.getCommitsCount(this.owner, this.repo, this.sha)
   },
   watch: {
-    scramble() {
-      this.saveSettingsToCookie()
-    },
     noWords() {
       this.saveSettingsToCookie()
     },
