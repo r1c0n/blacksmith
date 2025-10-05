@@ -2,14 +2,29 @@
   <div>
     <center>
       <!-- Main Window -->
-      <div class="window" style="width: 320px" @click="activateWindow('main')">
+      <div class="window" style="width: 380px" @click="activateWindow('main')">
         <TitleBar :title="'Blacksmith'" :inactive="isMainInactive" />
         <div class="window-body">
-          <p class="nuhuh">Click "Generate Password" to generate your secure password!</p>
+          <p class="nuhuh">Click "Generate Password" to create your secure password!</p>
           <button @click="generatePassword" style="margin-bottom: 10px">Generate Password</button>
           <ul class="tree-view">
-            <li id="password">{{ generatedPassword }}</li>
+            <li id="password" class="gen">
+              {{ generatedPassword || 'No password generated yet' }}
+            </li>
           </ul>
+          <button @click="copyToClipboard" style="margin-top: 10px" :disabled="!generatedPassword">
+            {{ copyButtonText }}
+          </button>
+          <div v-if="passwordStrength" style="margin-top: 10px">
+            <p>
+              <strong>Strength:</strong>
+              <span :style="{ color: passwordStrength.color }">{{ passwordStrength.label }}</span>
+            </p>
+            <p class="nuhuh" style="font-size: 11px">
+              Upper: {{ passwordStats.uppercase }} | Lower: {{ passwordStats.lowercase }} | Nums:
+              {{ passwordStats.numbers }} | Special: {{ passwordStats.special }}
+            </p>
+          </div>
         </div>
         <div class="status-bar">
           <p class="status-bar-field">Version: v{{ appVersion }}</p>
@@ -22,40 +37,92 @@
       </div>
       <br />
       <!-- Settings Window -->
-      <div class="window nuhuh" style="width: 320px" @click="activateWindow('settings')">
+      <div class="window nuhuh" style="width: 380px" @click="activateWindow('settings')">
         <TitleBar :title="'Blacksmith Settings'" :inactive="isSettingsInactive" />
         <div class="window-body">
           <div class="field-row">
-            <button @click="resetSettings">Default</button>
+            <button @click="resetSettings">Reset to Default</button>
           </div>
           <div class="field-row">
-            <input checked type="checkbox" id="noWordsInput" v-model="noWords" />
-            <label for="noWordsInput">No Words</label>
+            <input type="checkbox" id="noWordsInput" v-model="settings.noWords" />
+            <label for="noWordsInput">No Words (Letters Only)</label>
           </div>
           <div class="field-row">
-            <input checked type="checkbox" id="randomLengthInput" v-model="randomLength" />
+            <input type="checkbox" id="randomLengthInput" v-model="settings.randomLength" />
             <label for="randomLengthInput">Random Length</label>
           </div>
           <br />
           <div class="field-row">
-            <label for="text17">Length</label>
+            <label for="lengthInput">Length (8-128)</label>
             <input
-              id="text17"
-              type="text"
-              v-model.number="passwordLength"
-              :disabled="randomLength"
+              id="lengthInput"
+              type="number"
+              min="8"
+              max="128"
+              v-model.number="settings.passwordLength"
+              :disabled="settings.randomLength"
             />
           </div>
           <br />
           <fieldset>
-            <legend>Language Selection:</legend>
+            <legend>Minimum Requirements:</legend>
             <div class="field-row">
-              <label v-for="(value, key) in includeLanguages" :key="key" class="checkbox">
-                <input type="checkbox" :id="'language_' + key" v-model="includeLanguages[key]" />
-                <span class="checkbox-text">
-                  {{ includeLanguages[key] ? '✓ ' : '' }}{{ getDisplayText(key) }}
-                </span>
-              </label>
+              <label for="minUppercase">Min Uppercase:</label>
+              <input
+                id="minUppercase"
+                type="number"
+                min="0"
+                max="20"
+                v-model.number="settings.minUppercase"
+              />
+            </div>
+            <div class="field-row">
+              <label for="minLowercase">Min Lowercase:</label>
+              <input
+                id="minLowercase"
+                type="number"
+                min="0"
+                max="20"
+                v-model.number="settings.minLowercase"
+              />
+            </div>
+            <div class="field-row">
+              <label for="minNumbers">Min Numbers:</label>
+              <input
+                id="minNumbers"
+                type="number"
+                min="0"
+                max="20"
+                v-model.number="settings.minNumbers"
+              />
+            </div>
+            <div class="field-row">
+              <label for="minSpecial">Min Special:</label>
+              <input
+                id="minSpecial"
+                type="number"
+                min="0"
+                max="20"
+                v-model.number="settings.minSpecial"
+              />
+            </div>
+          </fieldset>
+          <br />
+          <fieldset>
+            <legend>Language Selection:</legend>
+            <div class="language-checkboxes">
+              <div
+                v-for="(value, key) in settings.includeLanguages"
+                :key="key"
+                class="language-checkbox-row"
+              >
+                <input
+                  type="checkbox"
+                  :id="'language_' + key"
+                  v-model="settings.includeLanguages[key]"
+                />
+                <label :for="'language_' + key">{{ getDisplayText(key) }}</label>
+              </div>
             </div>
           </fieldset>
         </div>
@@ -68,111 +135,158 @@
 import { languages } from '../characters.js'
 import TitleBar from './TitleBar.vue'
 import packageJson from '/package.json'
-import VueCookies from 'vue-cookies'
 import axios from 'axios'
 
 export default {
-  components: {
-    TitleBar
-  },
+  components: { TitleBar },
   data() {
     return {
       generatedPassword: '',
-      noWords: false,
-      includeLanguages: {
-        english: true,
-        german: true,
-        viet: true,
-        chinese: true,
-        russian: true,
-        numbers: true,
-        specialchars: true
+      settings: {
+        noWords: false,
+        includeLanguages: {
+          english: true,
+          german: true,
+          viet: true,
+          chinese: true,
+          russian: true,
+          numbers: true,
+          specialchars: true
+        },
+        passwordLength: 16,
+        randomLength: false,
+        minUppercase: 1,
+        minLowercase: 1,
+        minNumbers: 1,
+        minSpecial: 1
       },
       isMainInactive: false,
       isSettingsInactive: true,
-      passwordLength: 64,
-      randomLength: false,
       latestRelease: null,
-      ghAPI: 'https://api.github.com',
       owner: 'r1c0n',
       repo: 'blacksmith',
       sha: 'master',
-      commitCount: null
+      commitCount: null,
+      copyButtonText: 'Copy Password',
+      passwordStats: { uppercase: 0, lowercase: 0, numbers: 0, special: 0 }
     }
   },
   computed: {
     appVersion() {
       return packageJson.version
     },
-    title: String
+    passwordStrength() {
+      if (!this.generatedPassword) return null
+      const len = this.generatedPassword.length
+      const hasUpper = this.passwordStats.uppercase > 0
+      const hasLower = this.passwordStats.lowercase > 0
+      const hasNum = this.passwordStats.numbers > 0
+      const hasSpecial = this.passwordStats.special > 0
+
+      let score = 0
+      if (len >= 8) score++
+      if (len >= 12) score++
+      if (len >= 16) score++
+      if (hasUpper) score++
+      if (hasLower) score++
+      if (hasNum) score++
+      if (hasSpecial) score++
+
+      if (score <= 3) return { label: 'Weak', color: '#ff4444' }
+      if (score <= 5) return { label: 'Medium', color: '#ffaa00' }
+      return { label: 'Strong', color: '#44ff44' }
+    }
   },
   methods: {
     generatePassword() {
-      // check if no language is selected
-      const allLanguagesUnchecked = Object.values(this.includeLanguages).every((value) => !value)
-
+      const allLanguagesUnchecked = Object.values(this.settings.includeLanguages).every((v) => !v)
       if (allLanguagesUnchecked) {
-        this.includeLanguages.english = true // default to english
+        this.settings.includeLanguages.english = true
       }
 
-      let passwordLength = this.passwordLength
-      if (this.randomLength) {
-        passwordLength = Math.floor(Math.random() * 50) + 50 // random length up to 100 characters
+      let passwordLength = this.settings.passwordLength
+      if (this.settings.randomLength) {
+        passwordLength = Math.floor(Math.random() * 73) + 56
       }
-      let password = ''
-      this.usedWords = []
 
-      // ensure the password meets the criteria
-      let lowercaseCount = 0
-      while (password.length < passwordLength) {
-        const languageArray = this.getRandomLanguageArray()
-
-        if (this.includeLanguages[languageArray.name]) {
-          const randomWord = this.getRandomWord(languageArray)
-
-          // check if special characters checkbox is checked
-          if (languageArray.name === 'specialchars' && Math.random() < 0.1) {
-            const randomSpecialChar = '!@#$%^&*()_-+=<>?'[
-              Math.floor(Math.random() * '!@#$%^&*()_-+=<>?'.length)
-            ]
-            password += randomSpecialChar
-          }
-
-          password += randomWord
-          if (
-            languageArray !== languages.specialCharacters &&
-            languageArray !== languages.numbers
-          ) {
-            this.usedWords.push(randomWord)
-          }
-        }
-      }
-      // remove spaces from the password
-      password = password.replace(/\s+/g, '')
-
-      // capitalize random characters while ensuring at least 20 lowercase characters remain
-      const passwordArray = password.split('')
-      for (let i = 0; i < passwordArray.length; i++) {
-        if (Math.random() < 0.5 && lowercaseCount < 20) {
-          passwordArray[i] = passwordArray[i].toLowerCase()
-          lowercaseCount++
-        } else {
-          passwordArray[i] = passwordArray[i].toUpperCase()
-        }
-      }
-      password = passwordArray.join('')
-
+      let password = this.buildPasswordWithRequirements(passwordLength)
       this.generatedPassword = password
-
-      // log debug information
-      console.log('Generated Password:', password)
-      console.log('Password Length:', password.length)
-      console.log('No Words:', this.noWords)
-      console.log('Used Words:', this.usedWords)
-      console.log('App Version:', this.appVersion)
+      this.calculatePasswordStats(password)
+      this.saveSettings()
     },
+
+    buildPasswordWithRequirements(length) {
+      let password = []
+      let remaining = length
+
+      // Add minimum required characters
+      for (let i = 0; i < this.settings.minUppercase && remaining > 0; i++) {
+        password.push(this.getRandomChar('uppercase'))
+        remaining--
+      }
+      for (let i = 0; i < this.settings.minLowercase && remaining > 0; i++) {
+        password.push(this.getRandomChar('lowercase'))
+        remaining--
+      }
+      for (let i = 0; i < this.settings.minNumbers && remaining > 0; i++) {
+        password.push(this.getRandomChar('number'))
+        remaining--
+      }
+      for (let i = 0; i < this.settings.minSpecial && remaining > 0; i++) {
+        password.push(this.getRandomChar('special'))
+        remaining--
+      }
+
+      // Fill remaining with random characters
+      while (remaining > 0) {
+        const langArray = this.getRandomLanguageArray()
+        if (this.settings.includeLanguages[langArray.name]) {
+          const char = this.getRandomWord(langArray)
+          const processedChars = char.split('')
+          for (const c of processedChars) {
+            if (remaining > 0) {
+              password.push(Math.random() < 0.5 ? c.toUpperCase() : c.toLowerCase())
+              remaining--
+            }
+          }
+        }
+      }
+
+      // Shuffle the password
+      for (let i = password.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[password[i], password[j]] = [password[j], password[i]]
+      }
+
+      return password.join('').substring(0, length)
+    },
+
+    getRandomChar(type) {
+      const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+      const numbers = '0123456789'
+      const special = '!@#$%^&*()_-+=<>?'
+
+      let chars
+      switch (type) {
+        case 'uppercase':
+          chars = uppercase
+          break
+        case 'lowercase':
+          chars = lowercase
+          break
+        case 'number':
+          chars = numbers
+          break
+        case 'special':
+          chars = special
+          break
+      }
+      return chars[Math.floor(Math.random() * chars.length)]
+    },
+
     getRandomLanguageArray() {
-      if (this.noWords) {
+      if (this.settings.noWords) {
         const letterArrays = [
           { name: 'english', array: languages.letters.english },
           { name: 'german', array: languages.letters.german },
@@ -181,8 +295,7 @@ export default {
           { name: 'specialchars', array: languages.specialCharacters },
           { name: 'numbers', array: languages.numbers }
         ]
-        const randomIndex = Math.floor(Math.random() * letterArrays.length)
-        return letterArrays[randomIndex]
+        return letterArrays[Math.floor(Math.random() * letterArrays.length)]
       } else {
         const languageArrays = [
           { name: 'english', array: languages.words.english },
@@ -193,54 +306,87 @@ export default {
           { name: 'specialchars', array: languages.specialCharacters },
           { name: 'numbers', array: languages.numbers }
         ]
-        const randomIndex = Math.floor(Math.random() * languageArrays.length)
-        return languageArrays[randomIndex]
+        return languageArrays[Math.floor(Math.random() * languageArrays.length)]
       }
     },
-    getRandomWord(languageArray) {
-      const randomIndex = Math.floor(Math.random() * languageArray.array.length)
-      return languageArray.array[randomIndex]
+
+    getRandomWord(langArray) {
+      return String(langArray.array[Math.floor(Math.random() * langArray.array.length)])
     },
-    capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
-    },
-    getDisplayText(key) {
-      if (key === 'specialchars') {
-        return 'Special'
-      } else {
-        return this.capitalizeFirstLetter(key)
+
+    calculatePasswordStats(password) {
+      this.passwordStats = {
+        uppercase: (password.match(/[A-Z]/g) || []).length,
+        lowercase: (password.match(/[a-z]/g) || []).length,
+        numbers: (password.match(/[0-9]/g) || []).length,
+        special: (password.match(/[^A-Za-z0-9]/g) || []).length
       }
     },
-    activateWindow(window) {
-      if (window === 'main') {
-        this.isMainInactive = false
-        this.isSettingsInactive = true
-      } else if (window === 'settings') {
-        this.isMainInactive = true
-        this.isSettingsInactive = false
-      }
-    },
-    saveSettingsToCookie() {
-      VueCookies.set('settings', {
-        noWords: this.noWords,
-        includeLanguages: this.includeLanguages,
-        passwordLength: this.passwordLength,
-        randomLength: this.randomLength
+
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.generatedPassword).then(() => {
+        this.copyButtonText = 'Copied!'
+        setTimeout(() => {
+          this.copyButtonText = 'Copy Password'
+        }, 2000)
       })
     },
-    loadSettingsFromCookie() {
-      const settings = VueCookies.get('settings')
-      if (settings) {
-        this.noWords = settings.noWords
-        this.includeLanguages = settings.includeLanguages
-        this.passwordLength = settings.passwordLength
-        this.randomLength = settings.randomLength
+
+    capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    },
+
+    getDisplayText(key) {
+      return key === 'specialchars' ? 'Special' : this.capitalizeFirstLetter(key)
+    },
+
+    activateWindow(window) {
+      this.isMainInactive = window !== 'main'
+      this.isSettingsInactive = window !== 'settings'
+    },
+
+    saveSettings() {
+      const expires = new Date()
+      expires.setFullYear(expires.getFullYear() + 1)
+      document.cookie = `blacksmith_settings=${JSON.stringify(this.settings)}; expires=${expires.toUTCString()}; path=/; SameSite=Strict`
+    },
+
+    loadSettings() {
+      const cookies = document.cookie.split('; ')
+      const settingsCookie = cookies.find((c) => c.startsWith('blacksmith_settings='))
+      if (settingsCookie) {
+        try {
+          const saved = JSON.parse(decodeURIComponent(settingsCookie.split('=')[1]))
+          this.settings = { ...this.settings, ...saved }
+        } catch (e) {
+          console.error('Failed to load settings:', e)
+        }
       }
     },
+
     resetSettings() {
-      VueCookies.remove('settings')
-      window.location.reload()
+      document.cookie = 'blacksmith_settings=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      this.settings = {
+        noWords: false,
+        includeLanguages: {
+          english: true,
+          german: true,
+          viet: true,
+          chinese: true,
+          russian: true,
+          numbers: true,
+          specialchars: true
+        },
+        passwordLength: 16,
+        randomLength: false,
+        minUppercase: 1,
+        minLowercase: 1,
+        minNumbers: 1,
+        minSpecial: 1
+      }
+      this.saveSettings()
     },
+
     fetchLatestRelease() {
       axios
         .get('https://api.github.com/repos/r1c0n/blacksmith/releases/latest')
@@ -251,65 +397,56 @@ export default {
           console.error('Error fetching latest release:', error)
         })
     },
-    // https://gist.github.com/yershalom/a7c08f9441d1aadb13777bce4c7cdc3b?permalink_comment_id=3278742#gistcomment-3278742
-    httpGet(theUrl, returnHeaders) {
-      var xmlHttp = new XMLHttpRequest()
-      xmlHttp.open('GET', theUrl, false) // false for synchronous request
-      xmlHttp.send(null)
-      if (returnHeaders) {
-        return xmlHttp
-      }
-      return xmlHttp.responseText
+
+    httpGet(url, returnHeaders) {
+      const xhr = new XMLHttpRequest()
+      xhr.open('GET', url, false)
+      xhr.send(null)
+      return returnHeaders ? xhr : xhr.responseText
     },
+
     getCommitsCount() {
-      let firstCommit = this.getFirstCommit()
-      let compareUrl = `${this.ghAPI}/repos/${this.owner}/${this.repo}/compare/${firstCommit}...${this.sha}`
-      let commitReq = this.httpGet(compareUrl)
-      let commitCount = JSON.parse(commitReq)['total_commits'] + 1
-      console.log('Commit Count: ', commitCount)
+      const firstCommit = this.getFirstCommit()
+      const compareUrl = `https://api.github.com/repos/${this.owner}/${this.repo}/compare/${firstCommit}...${this.sha}`
+      const commitReq = this.httpGet(compareUrl)
+      const commitCount = JSON.parse(commitReq)['total_commits'] + 1
       this.commitCount = commitCount
     },
+
     getFirstCommit() {
-      let url = `${this.ghAPI}/repos/${this.owner}/${this.repo}/commits`
-      let req = this.httpGet(url, true)
+      const url = `https://api.github.com/repos/${this.owner}/${this.repo}/commits`
+      const req = this.httpGet(url, true)
       let firstCommitHash = ''
       if (req.getResponseHeader('Link')) {
-        let pageUrl = req
+        const pageUrl = req
           .getResponseHeader('Link')
           .split(',')[1]
           .split(';')[0]
           .split('<')[1]
           .split('>')[0]
-        let reqLastCommit = this.httpGet(pageUrl)
-        let firstCommit = JSON.parse(reqLastCommit)
+        const reqLastCommit = this.httpGet(pageUrl)
+        const firstCommit = JSON.parse(reqLastCommit)
         firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
       } else {
-        let firstCommit = JSON.parse(req.responseText)
+        const firstCommit = JSON.parse(req.responseText)
         firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
       }
       return firstCommitHash
     }
   },
+
   mounted() {
-    this.loadSettingsFromCookie()
+    this.loadSettings()
     this.fetchLatestRelease()
-    this.getCommitsCount(this.owner, this.repo, this.sha)
+    this.getCommitsCount()
   },
+
   watch: {
-    noWords() {
-      this.saveSettingsToCookie()
-    },
-    includeLanguages: {
+    settings: {
       handler() {
-        this.saveSettingsToCookie()
+        this.saveSettings()
       },
       deep: true
-    },
-    passwordLength() {
-      this.saveSettingsToCookie()
-    },
-    randomLength() {
-      this.saveSettingsToCookie()
     }
   }
 }

@@ -19,3 +19,26 @@ body {
   max-width: 100%;
   overflow-wrap: break-word;
 }
+
+.language-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.language-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-checkbox-row input[type='checkbox'] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.language-checkbox-row label {
+  margin: 0;
+  cursor: pointer;
+}
