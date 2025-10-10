@@ -90,6 +90,7 @@
                 min="0"
                 max="20"
                 v-model.number="settings.minNumbers"
+                :disabled="!settings.includeLanguages.numbers"
               />
             </div>
             <div class="field-row">
@@ -100,6 +101,7 @@
                 min="0"
                 max="20"
                 v-model.number="settings.minSpecial"
+                :disabled="!settings.includeLanguages.specialchars"
               />
             </div>
           </fieldset>
@@ -227,16 +229,22 @@ export default {
         password.push(this.getRandomChar('lowercase'))
         remaining--
       }
-      for (let i = 0; i < this.settings.minNumbers && remaining > 0; i++) {
-        password.push(this.getRandomChar('number'))
-        remaining--
-      }
-      for (let i = 0; i < this.settings.minSpecial && remaining > 0; i++) {
-        password.push(this.getRandomChar('special'))
-        remaining--
+
+      if (this.settings.includeLanguages.numbers) {
+        for (let i = 0; i < this.settings.minNumbers && remaining > 0; i++) {
+          password.push(this.getRandomChar('number'))
+          remaining--
+        }
       }
 
-      // fill remaining with random characters
+      if (this.settings.includeLanguages.specialchars) {
+        for (let i = 0; i < this.settings.minSpecial && remaining > 0; i++) {
+          password.push(this.getRandomChar('special'))
+          remaining--
+        }
+      }
+
+      // fill remaining with random characters as before
       while (remaining > 0) {
         const langArray = this.getRandomLanguageArray()
         if (this.settings.includeLanguages[langArray.name]) {
@@ -251,7 +259,7 @@ export default {
         }
       }
 
-      // shuffle the password
+      // Shuffle
       for (let i = password.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[password[i], password[j]] = [password[j], password[i]]
@@ -259,7 +267,6 @@ export default {
 
       return password.join('').substring(0, length)
     },
-
     getRandomChar(type) {
       const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       const lowercase = 'abcdefghijklmnopqrstuvwxyz'
@@ -329,33 +336,33 @@ export default {
       } else {
         // Fallback for browsers without navigator.clipboard
         try {
-          const textarea = document.createElement('textarea');
-          textarea.value = this.generatedPassword;
-          textarea.setAttribute('readonly', '');
-          textarea.style.position = 'absolute';
-          textarea.style.left = '-9999px';
-          document.body.appendChild(textarea);
-          textarea.select();
-          const successful = document.execCommand('copy');
-          document.body.removeChild(textarea);
+          const textarea = document.createElement('textarea')
+          textarea.value = this.generatedPassword
+          textarea.setAttribute('readonly', '')
+          textarea.style.position = 'absolute'
+          textarea.style.left = '-9999px'
+          document.body.appendChild(textarea)
+          textarea.select()
+          const successful = document.execCommand('copy')
+          document.body.removeChild(textarea)
           if (successful) {
-            this.copyButtonText = 'Copied!';
+            this.copyButtonText = 'Copied!'
             setTimeout(() => {
-              this.copyButtonText = 'Copy Password';
-            }, 2000);
+              this.copyButtonText = 'Copy Password'
+            }, 2000)
           } else {
-            this.copyButtonText = 'Copy Failed';
+            this.copyButtonText = 'Copy Failed'
             setTimeout(() => {
-              this.copyButtonText = 'Copy Password';
-            }, 2000);
-            console.error('Fallback: Failed to copy password');
+              this.copyButtonText = 'Copy Password'
+            }, 2000)
+            console.error('Fallback: Failed to copy password')
           }
         } catch (err) {
-          this.copyButtonText = 'Copy Failed';
+          this.copyButtonText = 'Copy Failed'
           setTimeout(() => {
-            this.copyButtonText = 'Copy Password';
-          }, 2000);
-          console.error('Fallback: Failed to copy password:', err);
+            this.copyButtonText = 'Copy Password'
+          }, 2000)
+          console.error('Fallback: Failed to copy password:', err)
         }
       }
     },
