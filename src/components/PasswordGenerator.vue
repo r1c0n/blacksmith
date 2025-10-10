@@ -16,14 +16,67 @@
             {{ copyButtonText }}
           </button>
           <div v-if="passwordStrength" style="margin-top: 10px">
-            <p>
+            <div style="margin-bottom: 8px">
               <strong>Strength:</strong>
-              <span :style="{ color: passwordStrength.color }">{{ passwordStrength.label }}</span>
+              <span :style="{ color: passwordStrength.color, fontWeight: 'bold' }">
+                {{ passwordStrength.label }}
+              </span>
+              <span style="margin-left: 8px; font-size: 12px; color: #666">
+                ({{ passwordStrength.percentage }}% - {{ passwordStrength.score }}/{{
+                  passwordStrength.maxScore
+                }})
+              </span>
+            </div>
+
+            <!-- Strength bar -->
+            <div
+              style="
+                width: 100%;
+                height: 6px;
+                background: #ddd;
+                border-radius: 3px;
+                margin-bottom: 8px;
+              "
+            >
+              <div
+                :style="{
+                  width: passwordStrength.percentage + '%',
+                  height: '100%',
+                  background: passwordStrength.color,
+                  borderRadius: '3px',
+                  transition: 'width 0.3s ease'
+                }"
+              ></div>
+            </div>
+
+            <p style="font-size: 11px; margin-bottom: 6px; color: #555">
+              {{ passwordStrength.description }} | Entropy: {{ passwordStrength.entropy }} bits
             </p>
-            <p class="nuhuh" style="font-size: 11px">
-              Upper: {{ passwordStats.uppercase }} | Lower: {{ passwordStats.lowercase }} | Nums:
-              {{ passwordStats.numbers }} | Special: {{ passwordStats.special }}
+
+            <p class="nuhuh" style="font-size: 11px; margin-bottom: 6px">
+              Length: {{ passwordStrength.details.length }} | Upper: {{ passwordStats.uppercase }} |
+              Lower: {{ passwordStats.lowercase }} | Numbers: {{ passwordStats.numbers }} | Special:
+              {{ passwordStats.special }}
             </p>
+
+            <!-- Bonuses -->
+            <div
+              v-if="passwordStrength.bonuses && passwordStrength.bonuses.length > 0"
+              style="margin-bottom: 6px"
+            >
+              <div style="font-size: 10px; color: #228b22; font-weight: bold">✓ Strengths:</div>
+              <div style="font-size: 10px; color: #228b22">
+                {{ passwordStrength.bonuses.join(', ') }}
+              </div>
+            </div>
+
+            <!-- Penalties -->
+            <div v-if="passwordStrength.penalties && passwordStrength.penalties.length > 0">
+              <div style="font-size: 10px; color: #dc143c; font-weight: bold">⚠ Weaknesses:</div>
+              <div style="font-size: 10px; color: #dc143c">
+                {{ passwordStrength.penalties.join(', ') }}
+              </div>
+            </div>
           </div>
         </div>
         <div class="status-bar">
@@ -174,24 +227,7 @@ export default {
     },
     passwordStrength() {
       if (!this.generatedPassword) return null
-      const len = this.generatedPassword.length
-      const hasUpper = this.passwordStats.uppercase > 0
-      const hasLower = this.passwordStats.lowercase > 0
-      const hasNum = this.passwordStats.numbers > 0
-      const hasSpecial = this.passwordStats.special > 0
-
-      let score = 0
-      if (len >= 8) score++
-      if (len >= 12) score++
-      if (len >= 16) score++
-      if (hasUpper) score++
-      if (hasLower) score++
-      if (hasNum) score++
-      if (hasSpecial) score++
-
-      if (score <= 3) return { label: 'Weak', color: '#ff4444' }
-      if (score <= 5) return { label: 'Medium', color: '#ffaa00' }
-      return { label: 'Strong', color: '#44ff44' }
+      return this.calculateAdvancedPasswordStrength(this.generatedPassword)
     }
   },
   methods: {
@@ -313,6 +349,234 @@ export default {
         lowercase: (password.match(/[a-z]/g) || []).length,
         numbers: (password.match(/[0-9]/g) || []).length,
         special: (password.match(/[^A-Za-z0-9]/g) || []).length
+      }
+    },
+
+    calculateAdvancedPasswordStrength(password) {
+      let score = 0
+      let maxScore = 100
+      let penalties = []
+      let bonuses = []
+
+      // === LENGTH SCORING ===
+      const length = password.length
+      if (length >= 8) score += 5
+      if (length >= 12) score += 10
+      if (length >= 16) score += 15
+      if (length >= 20) score += 10
+      if (length >= 24) score += 5
+
+      // length penalty for very short passwords
+      if (length < 8) {
+        penalties.push('Too short (< 8 chars)')
+        score -= 20
+      } else if (length < 12) {
+        penalties.push('Short password')
+        score -= 10
+      }
+
+      // === CHARACTER DIVERSITY ===
+      const hasUpper = /[A-Z]/.test(password)
+      const hasLower = /[a-z]/.test(password)
+      const hasNumbers = /[0-9]/.test(password)
+      const hasSpecial = /[^A-Za-z0-9]/.test(password)
+
+      let characterTypes = 0
+      if (hasUpper) {
+        score += 5
+        characterTypes++
+      }
+      if (hasLower) {
+        score += 5
+        characterTypes++
+      }
+      if (hasNumbers) {
+        score += 5
+        characterTypes++
+      }
+      if (hasSpecial) {
+        score += 10
+        characterTypes++
+      }
+
+      // bonus for using all character types
+      if (characterTypes === 4) {
+        score += 15
+        bonuses.push('All character types used')
+      } else if (characterTypes >= 3) {
+        score += 8
+        bonuses.push('Good character variety')
+      }
+
+      // === PATTERN ANALYSIS ===
+
+      // check for repeated characters
+      const repeatedChars = password.match(/(.)\1{2,}/g)
+      if (repeatedChars) {
+        penalties.push(`Repeated characters: ${repeatedChars.join(', ')}`)
+        score -= repeatedChars.length * 8
+      }
+
+      // check for sequential characters (both ascending and descending)
+      let sequentialCount = 0
+      for (let i = 0; i < password.length - 2; i++) {
+        const char1 = password.charCodeAt(i)
+        const char2 = password.charCodeAt(i + 1)
+        const char3 = password.charCodeAt(i + 2)
+
+        // sequential ascending or descending
+        if (
+          (char2 === char1 + 1 && char3 === char2 + 1) ||
+          (char2 === char1 - 1 && char3 === char2 - 1)
+        ) {
+          sequentialCount++
+        }
+      }
+
+      if (sequentialCount > 0) {
+        penalties.push(`Sequential patterns: ${sequentialCount}`)
+        score -= sequentialCount * 6
+      }
+
+      // check for keyboard patterns (qwerty, asdf, etc.)
+      const keyboardPatterns = [
+        'qwerty',
+        'asdf',
+        'zxcv',
+        'qaz',
+        'wsx',
+        'edc',
+        'rfv',
+        'tgb',
+        'yhn',
+        'ujm',
+        '123',
+        '456',
+        '789',
+        '012',
+        'abc',
+        'def',
+        'ghi'
+      ]
+
+      let keyboardPatternCount = 0
+      keyboardPatterns.forEach((pattern) => {
+        const regex = new RegExp(pattern, 'i')
+        if (regex.test(password)) {
+          keyboardPatternCount++
+        }
+      })
+
+      if (keyboardPatternCount > 0) {
+        penalties.push(`Keyboard patterns detected`)
+        score -= keyboardPatternCount * 10
+      }
+
+      // === ENTROPY CALCULATION ===
+
+      // calculate character set size
+      let charsetSize = 0
+      if (hasLower) charsetSize += 26
+      if (hasUpper) charsetSize += 26
+      if (hasNumbers) charsetSize += 10
+      if (hasSpecial) charsetSize += 32 // approximate special chars
+
+      // calculate entropy
+      const entropy = length * Math.log2(charsetSize)
+
+      // entropy bonuses
+      if (entropy >= 60) {
+        score += 20
+        bonuses.push('Excellent entropy')
+      } else if (entropy >= 40) {
+        score += 10
+        bonuses.push('Good entropy')
+      } else if (entropy < 28) {
+        penalties.push('Low entropy')
+        score -= 15
+      }
+
+      // === ADVANCED BONUSES ===
+
+      // bonus for mixed case within words (not just at beginning)
+      const mixedCaseWords = password.match(/[a-z][A-Z]|[A-Z][a-z]/g)
+      if (mixedCaseWords && mixedCaseWords.length > 0) {
+        score += 5
+        bonuses.push('Mixed case within words')
+      }
+
+      // bonus for special character variety
+      const specialChars = password.match(/[^A-Za-z0-9]/g)
+      if (specialChars) {
+        const uniqueSpecials = [...new Set(specialChars)]
+        if (uniqueSpecials.length >= 3) {
+          score += 8
+          bonuses.push('Diverse special characters')
+        }
+      }
+
+      // bonus for non-english characters (international characters)
+      if (/[^\x20-\x7E]/.test(password)) {
+        score += 10
+        bonuses.push('International characters')
+      }
+
+      // === FINAL SCORING ===
+
+      // ensure score is within bounds
+      score = Math.max(0, Math.min(maxScore, score))
+
+      // determine strength level and color
+      let label, color, description
+
+      if (score >= 85) {
+        label = 'Exceptional'
+        color = '#00ff00'
+        description = 'Extremely secure password'
+      } else if (score >= 70) {
+        label = 'Very Strong'
+        color = '#44ff44'
+        description = 'Very secure password'
+      } else if (score >= 55) {
+        label = 'Strong'
+        color = '#88ff44'
+        description = 'Secure password'
+      } else if (score >= 40) {
+        label = 'Good'
+        color = '#ffaa00'
+        description = 'Moderately secure'
+      } else if (score >= 25) {
+        label = 'Fair'
+        color = '#ff8800'
+        description = 'Weak security'
+      } else if (score >= 15) {
+        label = 'Weak'
+        color = '#ff4444'
+        description = 'Poor security'
+      } else {
+        label = 'Very Weak'
+        color = '#ff0000'
+        description = 'Extremely poor security'
+      }
+
+      return {
+        label,
+        color,
+        score,
+        maxScore,
+        percentage: Math.round((score / maxScore) * 100),
+        entropy: Math.round(entropy),
+        description,
+        bonuses,
+        penalties,
+        details: {
+          length,
+          characterTypes,
+          hasUpper,
+          hasLower,
+          hasNumbers,
+          hasSpecial
+        }
       }
     },
 
