@@ -310,21 +310,54 @@ export default {
     },
 
     copyToClipboard() {
-      navigator.clipboard
-        .writeText(this.generatedPassword)
-        .then(() => {
-          this.copyButtonText = 'Copied!'
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard
+          .writeText(this.generatedPassword)
+          .then(() => {
+            this.copyButtonText = 'Copied!'
+            setTimeout(() => {
+              this.copyButtonText = 'Copy Password'
+            }, 2000)
+          })
+          .catch((err) => {
+            this.copyButtonText = 'Copy Failed'
+            setTimeout(() => {
+              this.copyButtonText = 'Copy Password'
+            }, 2000)
+            console.error('Failed to copy password:', err)
+          })
+      } else {
+        // Fallback for browsers without navigator.clipboard
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = this.generatedPassword;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'absolute';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          if (successful) {
+            this.copyButtonText = 'Copied!';
+            setTimeout(() => {
+              this.copyButtonText = 'Copy Password';
+            }, 2000);
+          } else {
+            this.copyButtonText = 'Copy Failed';
+            setTimeout(() => {
+              this.copyButtonText = 'Copy Password';
+            }, 2000);
+            console.error('Fallback: Failed to copy password');
+          }
+        } catch (err) {
+          this.copyButtonText = 'Copy Failed';
           setTimeout(() => {
-            this.copyButtonText = 'Copy Password'
-          }, 2000)
-        })
-        .catch((err) => {
-          this.copyButtonText = 'Copy Failed'
-          setTimeout(() => {
-            this.copyButtonText = 'Copy Password'
-          }, 2000)
-          console.error('Failed to copy password:', err)
-        })
+            this.copyButtonText = 'Copy Password';
+          }, 2000);
+          console.error('Fallback: Failed to copy password:', err);
+        }
+      }
     },
 
     capitalizeFirstLetter(str) {
