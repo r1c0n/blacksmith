@@ -199,9 +199,13 @@ export default {
         this.settings.includeLanguages.english = true
       }
 
+      const MAX_RANDOM_LENGTH = 128
+      const MIN_RANDOM_LENGTH = 56
       let passwordLength = this.settings.passwordLength
       if (this.settings.randomLength) {
-        passwordLength = Math.floor(Math.random() * 73) + 56
+        passwordLength =
+          Math.floor(Math.random() * (MAX_RANDOM_LENGTH - MIN_RANDOM_LENGTH + 1)) +
+          MIN_RANDOM_LENGTH
       }
 
       let password = this.buildPasswordWithRequirements(passwordLength)
@@ -306,18 +310,21 @@ export default {
     },
 
     copyToClipboard() {
-      navigator.clipboard.writeText(this.generatedPassword).then(() => {
-        this.copyButtonText = 'Copied!'
-        setTimeout(() => {
-          this.copyButtonText = 'Copy Password'
-        }, 2000)
-      }).catch((err) => {
-        this.copyButtonText = 'Copy Failed'
-        setTimeout(() => {
-          this.copyButtonText = 'Copy Password'
-        }, 2000)
-        console.error('Failed to copy password:', err)
-      })
+      navigator.clipboard
+        .writeText(this.generatedPassword)
+        .then(() => {
+          this.copyButtonText = 'Copied!'
+          setTimeout(() => {
+            this.copyButtonText = 'Copy Password'
+          }, 2000)
+        })
+        .catch((err) => {
+          this.copyButtonText = 'Copy Failed'
+          setTimeout(() => {
+            this.copyButtonText = 'Copy Password'
+          }, 2000)
+          console.error('Failed to copy password:', err)
+        })
     },
 
     capitalizeFirstLetter(str) {
@@ -344,7 +351,9 @@ export default {
       const settingsCookie = cookies.find((c) => c.startsWith('blacksmith_settings='))
       if (settingsCookie) {
         try {
-          const saved = JSON.parse(decodeURIComponent(settingsCookie.substring(settingsCookie.indexOf('=') + 1)))
+          const saved = JSON.parse(
+            decodeURIComponent(settingsCookie.substring(settingsCookie.indexOf('=') + 1))
+          )
           if (
             saved &&
             typeof saved === 'object' &&
@@ -400,11 +409,19 @@ export default {
     },
 
     async httpGet(url, returnHeaders) {
-      const response = await fetch(url)
-      if (returnHeaders) {
-        return response
-      } else {
-        return await response.text()
+      try {
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        if (returnHeaders) {
+          return response
+        } else {
+          return await response.text()
+        }
+      } catch (error) {
+        console.error('Fetch error:', error)
+        throw error
       }
     },
 
