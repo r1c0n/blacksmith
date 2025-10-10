@@ -339,7 +339,21 @@ export default {
       if (settingsCookie) {
         try {
           const saved = JSON.parse(decodeURIComponent(settingsCookie.split('=')[1]))
-          this.settings = { ...this.settings, ...saved }
+          if (
+            saved &&
+            typeof saved === 'object' &&
+            typeof saved.passwordLength === 'number' &&
+            typeof saved.randomLength === 'boolean' &&
+            typeof saved.minUppercase === 'number' &&
+            typeof saved.minLowercase === 'number' &&
+            typeof saved.minNumbers === 'number' &&
+            typeof saved.minSpecial === 'number' &&
+            typeof saved.includeLanguages === 'object'
+          ) {
+            this.settings = { ...this.settings, ...saved }
+          } else {
+            console.warn('Settings cookie structure invalid:', saved)
+          }
         } catch (e) {
           console.error('Failed to load settings:', e)
         }
@@ -379,47 +393,45 @@ export default {
         })
     },
 
-    httpGet(url, returnHeaders) {
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', url, false)
-      xhr.send(null)
-      return returnHeaders ? xhr : xhr.responseText
+    async httpGet(url, returnHeaders) {
+      const response = await fetch(url)
+      if (returnHeaders) {
+        return response
+      } else {
+        return await response.text()
+      }
     },
 
-    getCommitsCount() {
-      const firstCommit = this.getFirstCommit()
+    async getCommitsCount() {
+      const firstCommit = await this.getFirstCommit()
       const compareUrl = `https://api.github.com/repos/${this.owner}/${this.repo}/compare/${firstCommit}...${this.sha}`
-      const commitReq = this.httpGet(compareUrl)
+      const commitReq = await this.httpGet(compareUrl)
       const commitCount = JSON.parse(commitReq)['total_commits'] + 1
       this.commitCount = commitCount
     },
 
-    getFirstCommit() {
+    async getFirstCommit() {
       const url = `https://api.github.com/repos/${this.owner}/${this.repo}/commits`
-      const req = this.httpGet(url, true)
+      const req = await this.httpGet(url, true)
       let firstCommitHash = ''
-      if (req.getResponseHeader('Link')) {
-        const pageUrl = req
-          .getResponseHeader('Link')
-          .split(',')[1]
-          .split(';')[0]
-          .split('<')[1]
-          .split('>')[0]
-        const reqLastCommit = this.httpGet(pageUrl)
+      const linkHeader = req.headers.get('Link')
+      if (linkHeader) {
+        const pageUrl = linkHeader.split(',')[1].split(';')[0].split('<')[1].split('>')[0]
+        const reqLastCommit = await this.httpGet(pageUrl)
         const firstCommit = JSON.parse(reqLastCommit)
         firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
       } else {
-        const firstCommit = JSON.parse(req.responseText)
+        const firstCommit = await req.json()
         firstCommitHash = firstCommit[firstCommit.length - 1]['sha']
       }
       return firstCommitHash
     }
   },
 
-  mounted() {
+  async mounted() {
     this.loadSettings()
     this.fetchLatestRelease()
-    this.getCommitsCount()
+    await this.getCommitsCount()
   },
 
   watch: {
