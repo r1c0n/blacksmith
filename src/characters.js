@@ -12,7 +12,7 @@ export const languages = {
     russian: russian.letters,
     viet: viet.letters
   },
-  numbers: Array.from({length: 10}, (_, i) => String(i)),
+  numbers: Array.from({ length: 10 }, (_, i) => String(i)),
   specialCharacters: [
     '!',
     '@',
