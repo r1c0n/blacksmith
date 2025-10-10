@@ -254,7 +254,7 @@ export default {
       // shuffle the password
       for (let i = password.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-        ;[password[i], password[j]] = [password[j], password[i]]
+        [password[i], password[j]] = [password[j], password[i]]
       }
 
       return password.join('').substring(0, length)
