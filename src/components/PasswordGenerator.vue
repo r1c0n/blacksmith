@@ -311,6 +311,12 @@ export default {
         setTimeout(() => {
           this.copyButtonText = 'Copy Password'
         }, 2000)
+      }).catch((err) => {
+        this.copyButtonText = 'Copy Failed'
+        setTimeout(() => {
+          this.copyButtonText = 'Copy Password'
+        }, 2000)
+        console.error('Failed to copy password:', err)
       })
     },
 
