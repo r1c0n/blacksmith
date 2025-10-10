@@ -1,5 +1,4 @@
 export const viet = {
-  words: ['Nhà', 'Quả táo', 'Xe hơi', 'Bàn', 'Bánh', 'Ghế', 'Hoa', 'Cửa sổ', 'Vườn', 'Nước'],
   letters: [
     'ạ',
     'Ạ',

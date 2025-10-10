@@ -44,10 +44,6 @@
             <button @click="resetSettings">Reset to Default</button>
           </div>
           <div class="field-row">
-            <input type="checkbox" id="noWordsInput" v-model="settings.noWords" />
-            <label for="noWordsInput">No Words (Letters Only)</label>
-          </div>
-          <div class="field-row">
             <input type="checkbox" id="randomLengthInput" v-model="settings.randomLength" />
             <label for="randomLengthInput">Random Length</label>
           </div>
@@ -143,7 +139,6 @@ export default {
     return {
       generatedPassword: '',
       settings: {
-        noWords: false,
         includeLanguages: {
           english: true,
           german: true,
@@ -219,7 +214,7 @@ export default {
       let password = []
       let remaining = length
 
-      // Add minimum required characters
+      // add minimum required characters
       for (let i = 0; i < this.settings.minUppercase && remaining > 0; i++) {
         password.push(this.getRandomChar('uppercase'))
         remaining--
@@ -237,7 +232,7 @@ export default {
         remaining--
       }
 
-      // Fill remaining with random characters
+      // fill remaining with random characters
       while (remaining > 0) {
         const langArray = this.getRandomLanguageArray()
         if (this.settings.includeLanguages[langArray.name]) {
@@ -252,7 +247,7 @@ export default {
         }
       }
 
-      // Shuffle the password
+      // shuffle the password
       for (let i = password.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[password[i], password[j]] = [password[j], password[i]]
@@ -286,28 +281,15 @@ export default {
     },
 
     getRandomLanguageArray() {
-      if (this.settings.noWords) {
-        const letterArrays = [
-          { name: 'english', array: languages.letters.english },
-          { name: 'german', array: languages.letters.german },
-          { name: 'viet', array: languages.letters.viet },
-          { name: 'chinese', array: languages.letters.chinese },
-          { name: 'specialchars', array: languages.specialCharacters },
-          { name: 'numbers', array: languages.numbers }
-        ]
-        return letterArrays[Math.floor(Math.random() * letterArrays.length)]
-      } else {
-        const languageArrays = [
-          { name: 'english', array: languages.words.english },
-          { name: 'german', array: languages.words.german },
-          { name: 'chinese', array: languages.words.chinese },
-          { name: 'russian', array: languages.words.russian },
-          { name: 'viet', array: languages.words.viet },
-          { name: 'specialchars', array: languages.specialCharacters },
-          { name: 'numbers', array: languages.numbers }
-        ]
-        return languageArrays[Math.floor(Math.random() * languageArrays.length)]
-      }
+      const letterArrays = [
+        { name: 'english', array: languages.letters.english },
+        { name: 'german', array: languages.letters.german },
+        { name: 'viet', array: languages.letters.viet },
+        { name: 'chinese', array: languages.letters.chinese },
+        { name: 'specialchars', array: languages.specialCharacters },
+        { name: 'numbers', array: languages.numbers }
+      ]
+      return letterArrays[Math.floor(Math.random() * letterArrays.length)]
     },
 
     getRandomWord(langArray) {
@@ -367,7 +349,6 @@ export default {
     resetSettings() {
       document.cookie = 'blacksmith_settings=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
       this.settings = {
-        noWords: false,
         includeLanguages: {
           english: true,
           german: true,

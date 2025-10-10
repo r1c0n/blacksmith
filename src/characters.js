@@ -5,13 +5,6 @@ import { russian } from './lang/russian'
 import { viet } from './lang/viet'
 
 export const languages = {
-  words: {
-    english: english.words,
-    german: german.words,
-    chinese: chinese.words,
-    russian: russian.words,
-    viet: viet.words
-  },
   letters: {
     english: english.letters,
     german: german.letters,
