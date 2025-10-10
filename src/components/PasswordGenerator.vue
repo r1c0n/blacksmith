@@ -344,7 +344,7 @@ export default {
       const settingsCookie = cookies.find((c) => c.startsWith('blacksmith_settings='))
       if (settingsCookie) {
         try {
-          const saved = JSON.parse(decodeURIComponent(settingsCookie.split('=')[1]))
+          const saved = JSON.parse(decodeURIComponent(settingsCookie.substring(settingsCookie.indexOf('=') + 1)))
           if (
             saved &&
             typeof saved === 'object' &&
